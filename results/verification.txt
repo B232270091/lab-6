@@ -1,0 +1,52 @@
+Independent finite-domain verification: PASS
+Command: node scripts/verify.mjs
+No PICT run, random seed, external dependency, or transfer implementation is used by this checker.
+Enumerated transfer frames: full=216; IF/SINGLE=129; IF/SINGLE plus <=1 ERROR choice=33.
+The 33 isolated frames comprise 5 happy frames and 28 single-error frames.
+Generated-row numbers below are 1-based DATA rows (header excluded).
+
+browser-2way.txt: rows=10; 2-way coverage=81/81; duplicates=0.
+browser-3way.txt: rows=20; 3-way coverage=248/248; duplicates=0.
+
+transfer-nc.txt: rows=18; pair coverage=97/97; happy=0; duplicates=0; ExactLimit rows=3.
+  Selected ERROR-choice count histogram (count:rows): {"1":6,"2":6,"3":6}
+  Known violated-predicate count histogram: {"1":6,"2":5,"3":6,"4":1}
+  Existing-source full predicate-count histogram: {"1":4,"2":5,"3":2,"4":1}
+  Missing-source rows with undefined financial checks: 6; known balance+limit overlaps at data rows: [5].
+  Oracle distribution: {"ERROR_NO_TO":2,"ERROR_LIMIT":1,"ERROR_SAME_ACCOUNT":2,"ERROR_NO_FROM":6,"ERROR_FROZEN":6,"ERROR_BAD_AMOUNT":1}
+transfer.txt: rows=16; pair coverage=88/88; happy=1; duplicates=0; ExactLimit rows=1.
+  Selected ERROR-choice count histogram (count:rows): {"0":1,"1":4,"2":5,"3":6}
+  Known violated-predicate count histogram: {"0":1,"1":5,"2":5,"3":5}
+  Existing-source full predicate-count histogram: {"0":1,"1":3,"2":4,"3":3}
+  Missing-source rows with undefined financial checks: 5; known balance+limit overlaps at data rows: [].
+  Oracle distribution: {"ERROR_FROZEN":5,"ERROR_NO_FROM":5,"ERROR_NO_TO":1,"ERROR_INSUFFICIENT":1,"ERROR_BAD_AMOUNT":1,"ERROR_SAME_ACCOUNT":2,"OK":1}
+transfer-neg.txt: rows=22; pair coverage=69/69; happy=5; duplicates=0; ExactLimit rows=1.
+  Selected ERROR-choice count histogram (count:rows): {"0":5,"1":17}
+  Known violated-predicate count histogram: {"0":5,"1":17}
+  Existing-source full predicate-count histogram: {"0":5,"1":15}
+  Missing-source rows with undefined financial checks: 2; known balance+limit overlaps at data rows: [].
+  Oracle distribution: {"OK":5,"ERROR_LIMIT":2,"ERROR_BAD_AMOUNT":5,"ERROR_NO_TO":2,"ERROR_SAME_ACCOUNT":2,"ERROR_NO_FROM":2,"ERROR_INSUFFICIENT":2,"ERROR_FROZEN":2}
+
+Semantic caveat: ERROR-choice counts are selected category labels, not the number of API responses.
+Known predicates are fixture conditions, including conditions masked by the chosen validation order.
+For From=Missing, balance/limit predicates are undefined and omitted from known-predicate counts.
+Therefore those counts are not a complete semantic fault count for missing-source rows.
+Negative pair coverage excludes pairs containing two negative choices and all IF/SINGLE-infeasible pairs.
+
+Concrete cases from actual PICT data rows:
+transfer-neg.txt data#2: {"From":"Valid","To":"Valid","Amount":"Normal","Currency":"Different","DailyUsage":"Fresh"}
+  {"body":{"from":"A100","to":"A200","amount":50,"currency":"USD"},"debit":100,"used":0,"remaining":2000,"financialChecksDefined":true,"faults":[],"status":201,"result":"OK"}
+transfer-neg.txt data#6: {"From":"Valid","To":"Valid","Amount":"OverLimit","Currency":"Different","DailyUsage":"Used"}
+  {"body":{"from":"A100","to":"A200","amount":250.5,"currency":"USD"},"debit":501,"used":1500,"remaining":500,"financialChecksDefined":true,"faults":["ERROR_LIMIT"],"status":200,"result":"ERROR_LIMIT"}
+transfer.txt data#2: {"From":"Frozen","To":"SameAsFrom","Amount":"Zero","Currency":"Different","DailyUsage":"Fresh"}
+  {"body":{"from":"F100","to":"F100","amount":0,"currency":"USD"},"debit":0,"used":0,"remaining":2000,"financialChecksDefined":true,"faults":["ERROR_FROZEN","ERROR_SAME_ACCOUNT","ERROR_BAD_AMOUNT"],"status":200,"result":"ERROR_FROZEN"}
+transfer-neg.txt data#20: {"From":"Valid","To":"Valid","Amount":"OverBalance","Currency":"Different","DailyUsage":"Fresh"}
+  {"body":{"from":"A100","to":"A200","amount":500.5,"currency":"USD"},"debit":1001,"used":0,"remaining":2000,"financialChecksDefined":true,"faults":["ERROR_INSUFFICIENT"],"status":200,"result":"ERROR_INSUFFICIENT"}
+transfer.txt data#11: {"From":"Valid","To":"Valid","Amount":"ExactLimit","Currency":"Same","DailyUsage":"Used"}
+  {"body":{"from":"A100","to":"A200","amount":500,"currency":"MNT"},"debit":500,"used":1500,"remaining":500,"financialChecksDefined":true,"faults":[],"status":201,"result":"OK"}
+transfer-nc.txt data#1: {"From":"Valid","To":"Missing","Amount":"ExactLimit","Currency":"Same","DailyUsage":"Fresh"}
+  {"body":{"from":"A100","to":"Y404","amount":2000,"currency":"MNT"},"debit":2000,"used":0,"remaining":2000,"financialChecksDefined":true,"faults":["ERROR_NO_TO","ERROR_INSUFFICIENT"],"status":200,"result":"ERROR_NO_TO"}
+transfer-nc.txt data#5: {"From":"Frozen","To":"Missing","Amount":"OverLimit","Currency":"Different","DailyUsage":"Fresh"}
+  {"body":{"from":"F100","to":"Y404","amount":1000.5,"currency":"USD"},"debit":2001,"used":0,"remaining":2000,"financialChecksDefined":true,"faults":["ERROR_FROZEN","ERROR_NO_TO","ERROR_INSUFFICIENT","ERROR_LIMIT"],"status":200,"result":"ERROR_FROZEN"}
+
+All checks passed. This validates design artifacts and coverage, not a running bank API.

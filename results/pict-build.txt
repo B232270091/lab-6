@@ -4,6 +4,7 @@ Verified at (Asia/Ulaanbaatar): 2026-10-13 22:44:59 +08:00
 Source repository: https://github.com/microsoft/pict
 Commit: ab76c2548f551fcb46314e58653a1bd1172f3a72
 Commit date: 2026-09-08T11:25:45-07:00
+pict commit ab76c25 2026-09-08
 Source changes: none (official Makefile and C++ sources used unchanged).
 Source/build directory: C:\Users\enhta\AppData\Local\Temp\lab6-pict-source-build\pict
 Executable: C:\Users\enhta\AppData\Local\Temp\lab6-pict-source-build\pict\pict.exe
@@ -53,14 +54,6 @@ Options:
  /c               - Case-sensitive model evaluation
  /s               - Show model statistics
 No-model usage exit code: 3 (expected; a model is required).
-
-Additional smoke test:
-& (Join-Path $pictSource 'pict.exe') (Join-Path $pictSource 'doc\sample-models\create_volume.txt') /r:1 /s
-Combinations:   218
-Generated tests:41
-Generation time:0:00:00
-Used seed: 1
-Smoke-test exit code: 0
 
 Only this evidence file belongs in the lab repository.
 The source checkout, portable compiler and all build products remain in the temporary directory.
