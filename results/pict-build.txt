@@ -1,0 +1,66 @@
+Lab 06 - Microsoft PICT source-build evidence
+Verified at (Asia/Ulaanbaatar): 2026-10-13 22:44:59 +08:00
+
+Source repository: https://github.com/microsoft/pict
+Commit: ab76c2548f551fcb46314e58653a1bd1172f3a72
+Commit date: 2026-09-08T11:25:45-07:00
+Source changes: none (official Makefile and C++ sources used unchanged).
+Source/build directory: C:\Users\enhta\AppData\Local\Temp\lab6-pict-source-build\pict
+Executable: C:\Users\enhta\AppData\Local\Temp\lab6-pict-source-build\pict\pict.exe
+Executable SHA256: 38F0B7EF5A06AA9EEDC1D6E05F3DC90A78082D478A827A611DE1D011D753C675
+
+Environment: Windows x64, PowerShell; WSL is not installed.
+Toolchain: w64devkit 2.10.0, GCC 16.2.0, GNU Make 4.4.1.
+Target: x86_64-w64-mingw32.
+Portable compiler archive: https://github.com/skeeto/w64devkit/releases/download/v2.10.0/w64devkit-x64-2.10.0.7z.exe
+Compiler archive SHA256: 18D0A4C71A166F8401AB6305781BEC5882B40B5E06BA9807C61CB5F3B3C6325E
+No OS-wide install or permanent PATH/configuration change was made.
+
+Reproduction commands (PowerShell; download/extract only needed once):
+$buildRoot = Join-Path $env:TEMP 'lab6-pict-source-build'
+New-Item -ItemType Directory -Path $buildRoot -Force | Out-Null
+git clone https://github.com/microsoft/pict.git (Join-Path $buildRoot 'pict')
+$pictSource = Join-Path $buildRoot 'pict'
+git -C $pictSource checkout ab76c2548f551fcb46314e58653a1bd1172f3a72
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/skeeto/w64devkit/releases/download/v2.10.0/w64devkit-x64-2.10.0.7z.exe' -OutFile (Join-Path $buildRoot 'w64devkit-x64-2.10.0.7z.exe')
+& (Join-Path $buildRoot 'w64devkit-x64-2.10.0.7z.exe') -y ('-o' + $buildRoot)
+$env:PATH = (Join-Path $buildRoot 'w64devkit\bin') + ';' + $env:PATH
+Set-Location -LiteralPath $pictSource
+& (Join-Path $buildRoot 'w64devkit\bin\make.exe') -j2 pict
+& (Join-Path $pictSource 'pict.exe')
+
+Actual build result: exit code 0.
+The official Makefile compiled the 8 api/*.cpp and 12 cli/*.cpp translation units.
+Compile flags: -fPIC -pipe -std=c++11 -O2 -Iapi
+Linker: x86_64-w64-mingw32-g++ (20 object files) -o pict
+
+Actual initial CLI output:
+Pairwise Independent Combinatorial Testing
+
+Usage: pict model [options]
+
+Options:
+ /o:N|max         - Order of combinations (default: 2)
+ /d:C             - Separator for values  (default: ,)
+ /a:C             - Separator for aliases (default: |)
+ /n:C             - Negative value prefix (default: ~)
+ /e:file          - File with seeding rows
+ /r[:N]           - Randomize generation, N - seed
+ /b:N             - Try N seeds, keep the smallest suite
+ /t:N             - Number of worker threads (default: auto)
+ /f[:text|json]   - Output format (default: text)
+ /c               - Case-sensitive model evaluation
+ /s               - Show model statistics
+No-model usage exit code: 3 (expected; a model is required).
+
+Additional smoke test:
+& (Join-Path $pictSource 'pict.exe') (Join-Path $pictSource 'doc\sample-models\create_volume.txt') /r:1 /s
+Combinations:   218
+Generated tests:41
+Generation time:0:00:00
+Used seed: 1
+Smoke-test exit code: 0
+
+Only this evidence file belongs in the lab repository.
+The source checkout, portable compiler and all build products remain in the temporary directory.

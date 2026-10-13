@@ -17,7 +17,7 @@
 | Ангилал | Сонголт | Төлөөлөх утга буюу setup | Тэмдэглэгээ ба үндэслэл |
 |---|---|---|---|
 | from | Valid | A100, оршин байгаа, frozen=false | `[property source_exists, source_active]` — ердийн шилжүүлэгт шаардлагатай. |
-| from | Frozen | F100, frozen=true | `[ERROR]` — ERROR_FROZEN өдөөдөг. |
+| from | Frozen | F100, frozen=true | `[ERROR] [property source_exists]` — оршин байгаа боловч царцаатай данс ERROR_FROZEN өдөөдөг. |
 | from | Missing | X404, үүсгэхгүй | `[ERROR]` — ERROR_NO_FROM өдөөдөг. |
 | to | Valid | A200 | `[property target_exists, distinct]` — эх данснаас өөр, хүчинтэй хүлээн авагч. |
 | to | Missing | Y404, үүсгэхгүй | `[ERROR]` — ERROR_NO_TO өдөөдөг. |
@@ -79,3 +79,21 @@ ERROR тусгаарлалтыг нэмж хэрэглэвэл: зөв Normal fr
 | A14 | Frozen | SameAsFrom | Normal | Same | Fresh | 100 | 200 ERROR_FROZEN — хоёр алдаанаас FROZEN түрүүлнэ |
 
 A14 нь эх данс царцаатай бөгөөд өөр лүүгээ шилжүүлж байгаа сонирхолтой давхар нөхцөл. Энэ мөр IF/SINGLE шүүлтэд зөвшөөрөгдөнө, харин ERROR тусгаарласан 33 frame-д орохгүй; эрэмбийг тусгайлан шалгах нэмэлт тест болно. A11, A12-ын USD дүнг эхлээд MNT-д хөрвүүлэхгүйгээр шалгавал буруу шийдвэр гарахыг oracle нь илрүүлнэ.
+
+## B1 Браузерын pairwise ба 3 way загвар
+
+[browser.model](browser.model) файл нь лекцийн 3×3×2×2×2×2 = **144** бүрэн тохиргоотой жишээг өөрчлөлтгүй агуулна. PICT-ийг [Microsoft-ийн эх кодоос](https://github.com/microsoft/pict) Windows дээр portable GCC болон GNU Make ашиглан бүтээсэн. Эх кодын commit, toolchain, build команд, жинхэнэ хэрэглээний гаралт [results/pict-build.txt](results/pict-build.txt) файлд бий; эх код, compiler, binary нь repository-оос гадна хадгалагдсан.
+
+```sh
+pict browser.model > results/browser-2way.txt
+pict browser.model /o:3 > results/browser-3way.txt
+```
+
+| Багц | Тестийн мөрийн тоо, толгойг оруулаагүй | 144-өөс эзлэх хувь | Нотолгоо |
+|---|---:|---:|---|
+| Бүрэн олонлог | 144 | 100% | 3×3×2×2×2×2 |
+| Лекцийн гар ажиллагааны 2-way | 9 | 6.25% | Даалгаварт өгсөн харьцуулах утга |
+| PICT 2-way | 10 | 6.94% | [browser-2way.txt](results/browser-2way.txt) |
+| PICT 3-way | 20 | 13.89% | [browser-3way.txt](results/browser-3way.txt) |
+
+PICT-ийн 2-way багц **10 мөр**, лекцийн гар ажиллагааны 9 мөрөөс нэгээр олон гарсан. PICT нь greedy аргаар хамрагдаагүй хосуудыг нэмж хамрах мөр сонгодог тул хамралтыг хангах боловч хамгийн бага мөрийн тоог заавал олохгүй. 3-way нь гурван параметрийн нийлсэн сонголтуудыг хамрахын тулд 20 мөр шаардсан нь энэ ажиллуулалтад 2-way-аас хоёр дахин олон боловч бүрэн 144 тохиргооноос 124-өөр цөөн юм.
