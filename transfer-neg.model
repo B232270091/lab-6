@@ -1,0 +1,11 @@
+# ERROR isolation plus the same IF and SINGLE constraints.
+From:       Valid, ~Frozen, ~Missing
+To:         Valid, ~Missing, ~SameAsFrom
+Amount:     Normal, ~Zero, ~Negative, ~OverBalance, ~OverLimit, ExactLimit
+Currency:   Same, Different
+DailyUsage: Fresh, Used
+
+IF [To] = "SameAsFrom" THEN [From] <> "Missing";
+IF [Amount] = "OverBalance" THEN [DailyUsage] = "Fresh";
+IF [Amount] = "OverLimit" THEN [DailyUsage] = "Used";
+IF [Amount] = "ExactLimit" THEN [From] = "Valid" AND [To] = "Valid" AND [Currency] = "Same" AND [DailyUsage] = "Used";

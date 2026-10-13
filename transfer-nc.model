@@ -1,0 +1,7 @@
+# Fixed representatives and fixture mapping are defined in README.md.
+# No constraints: includes interacting faults and redundant frames.
+From:       Valid, Frozen, Missing
+To:         Valid, Missing, SameAsFrom
+Amount:     Normal, Zero, Negative, OverBalance, OverLimit, ExactLimit
+Currency:   Same, Different
+DailyUsage: Fresh, Used
